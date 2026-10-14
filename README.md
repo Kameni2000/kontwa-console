@@ -1,5 +1,7 @@
 # Kontwa Console
 
+[![CI](https://github.com/Kameni2000/kontwa-console/actions/workflows/ci.yml/badge.svg)](https://github.com/Kameni2000/kontwa-console/actions/workflows/ci.yml)
+
 **Tableau de bord commerçant pour Kontwa**, l'assistant qui prend les commandes des petits commerces sur WhatsApp.
 Le commerçant voit arriver ses commandes en temps réel, les fait avancer (reçue → en préparation → prête → livrée), gère son catalogue et suit ses ventes.
 
