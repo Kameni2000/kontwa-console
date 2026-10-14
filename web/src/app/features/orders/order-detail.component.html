@@ -1,0 +1,83 @@
+<a routerLink="/commandes" class="back">← Toutes les commandes</a>
+
+@if (order(); as o) {
+  <header class="head">
+    <div>
+      <p class="muted number">{{ o.number }} · reçue {{ o.createdAt | timeAgo }} ({{ o.createdAt | date: 'd MMM, HH:mm' }})</p>
+      <h1>{{ o.customerName }}</h1>
+    </div>
+    <kc-status-badge [status]="o.status" />
+  </header>
+
+  @if (error(); as message) {
+    <p class="alert" role="alert">{{ message }}</p>
+  }
+
+  <div class="grid">
+    <section class="card block">
+      <h2>Articles</h2>
+      <table class="items">
+        <thead>
+          <tr><th scope="col">Produit</th><th scope="col" class="num">Qté</th><th scope="col" class="num">Prix</th><th scope="col" class="num">Total</th></tr>
+        </thead>
+        <tbody>
+          @for (item of o.items; track item.productId) {
+            <tr>
+              <td>{{ item.name }}</td>
+              <td class="num">{{ item.quantity }}</td>
+              <td class="num">{{ item.unitPrice | fcfa }}</td>
+              <td class="num">{{ item.quantity * item.unitPrice | fcfa }}</td>
+            </tr>
+          }
+        </tbody>
+        <tfoot>
+          <tr><th scope="row" colspan="3">Total</th><td class="num total">{{ o.total | fcfa }}</td></tr>
+        </tfoot>
+      </table>
+      @if (o.note) {
+        <p class="note"><strong>Note du client :</strong> {{ o.note }}</p>
+      }
+    </section>
+
+    <aside class="side">
+      <section class="card block">
+        <h2>Suivi</h2>
+        @if (o.status === 'annulee') {
+          <p class="muted">Cette commande a été annulée.</p>
+        } @else {
+          <ol class="steps">
+            @for (s of steps(); track s.status) {
+              <li [class.done]="s.done" [class.current]="s.current">{{ s.label }}</li>
+            }
+          </ol>
+        }
+        <div class="actions">
+          @for (a of actions(); track a) {
+            <button
+              type="button"
+              class="btn"
+              [class.btn--danger]="a === 'annulee'"
+              [disabled]="saving()"
+              (click)="change(a)"
+            >
+              {{ actionLabel(a) }}
+            </button>
+          }
+          @if (actions().length === 0) {
+            <p class="muted">Aucune action possible : la commande est terminée.</p>
+          }
+        </div>
+      </section>
+
+      <section class="card block">
+        <h2>Client</h2>
+        <p>{{ o.customerName }}</p>
+        <p class="muted">{{ o.customerPhone }} · via WhatsApp</p>
+      </section>
+    </aside>
+  </div>
+} @else if (error()) {
+  <div class="card block"><p class="alert" role="alert">{{ error() }}</p></div>
+} @else {
+  <p class="muted" aria-busy="true">Chargement…</p>
+}

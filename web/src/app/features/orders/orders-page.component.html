@@ -1,0 +1,98 @@
+<header class="page-head">
+  <div>
+    <h1>Commandes</h1>
+    <p class="muted sync" aria-live="polite">
+      <span class="live-dot" aria-hidden="true"></span>
+      Reçues par WhatsApp · actualisé automatiquement
+    </p>
+  </div>
+
+  @if (demoMode) {
+    <div class="demo-tools">
+      <label class="toggle">
+        <input type="checkbox" [checked]="autoSimulate()" (change)="autoSimulate.set(!autoSimulate())" />
+        <span>Commandes automatiques</span>
+      </label>
+      <button type="button" class="btn btn--sm" (click)="simulateNow()">+ Simuler une commande</button>
+    </div>
+  }
+</header>
+
+<div class="toolbar">
+  <div class="chips" role="tablist" aria-label="Filtrer par statut">
+    @for (f of filters; track f.value) {
+      <button
+        type="button"
+        role="tab"
+        class="chip"
+        [class.chip--on]="store.statusFilter() === f.value"
+        [attr.aria-selected]="store.statusFilter() === f.value"
+        (click)="store.statusFilter.set(f.value)"
+      >
+        {{ f.label }} <span class="chip-count">{{ store.counts()[f.value] }}</span>
+      </button>
+    }
+  </div>
+  <input
+    class="input search"
+    type="search"
+    placeholder="Rechercher un client ou un n° de commande"
+    aria-label="Rechercher"
+    [value]="store.query()"
+    (input)="onSearch($event)"
+  />
+</div>
+
+@if (actionError(); as message) {
+  <p class="alert" role="alert">{{ message }}</p>
+}
+
+@if (store.error() && store.orders().length === 0) {
+  <div class="card empty">
+    <p class="alert" role="alert">{{ store.error() }}</p>
+    <button class="btn btn--ghost" type="button" (click)="retry()">Réessayer</button>
+  </div>
+} @else if (store.loading()) {
+  <div class="card list" aria-busy="true">
+    @for (i of [1, 2, 3, 4]; track i) {
+      <div class="row skeleton"><span></span><span></span><span></span></div>
+    }
+  </div>
+} @else if (store.filtered().length === 0) {
+  <div class="card empty">
+    <p><strong>Aucune commande ici.</strong></p>
+    <p class="muted">Les nouvelles commandes WhatsApp apparaîtront automatiquement.</p>
+  </div>
+} @else {
+  <ul class="card list" aria-label="Liste des commandes">
+    @for (order of store.filtered(); track order.id) {
+      <li class="row" [class.row--fresh]="store.freshIds().has(order.id)">
+        <a class="row-link" [routerLink]="['/commandes', order.id]" (click)="store.markSeen(order.id)">
+          <div class="who">
+            <span class="number">{{ order.number }}</span>
+            <strong>{{ order.customerName }}</strong>
+            @if (store.freshIds().has(order.id)) {
+              <span class="new">Nouvelle</span>
+            }
+          </div>
+          <p class="items muted">{{ itemsSummary(order) }}</p>
+          <div class="meta">
+            <kc-status-badge [status]="order.status" />
+            <span class="muted time">{{ order.createdAt | timeAgo }}</span>
+            <span class="total">{{ order.total | fcfa }}</span>
+          </div>
+        </a>
+        @if (primaryAction(order); as next) {
+          <button
+            type="button"
+            class="btn btn--sm btn--ghost action"
+            [disabled]="busyId() === order.id"
+            (click)="advance(order, next, $event)"
+          >
+            {{ actionLabel(next) }}
+          </button>
+        }
+      </li>
+    }
+  </ul>
+}

@@ -1,0 +1,77 @@
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  p { margin: 4px 0 0; }
+}
+
+.alert { margin: 0 0 16px; }
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  &--panel { grid-template-columns: minmax(0, 1fr) 360px; }
+}
+
+.groups { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+.group {
+  padding: 16px 18px 6px;
+  h2 { margin-bottom: 6px; }
+  ul { list-style: none; margin: 0; padding: 0; }
+}
+
+.product {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  &--off .info, &--off .price { opacity: .55; }
+}
+
+.info { display: flex; flex-direction: column; min-width: 0; }
+.desc { font-size: 13px; }
+.price { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.switch {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; color: var(--text-soft); cursor: pointer; white-space: nowrap;
+  input { accent-color: var(--accent); width: 16px; height: 16px; }
+}
+
+.row-actions { display: flex; gap: 6px; align-items: center; justify-content: flex-end; min-width: 150px; }
+
+.panel {
+  position: sticky;
+  top: 20px;
+  padding: 20px;
+  h2 { margin-bottom: 16px; }
+  form { display: flex; flex-direction: column; gap: 14px; }
+}
+
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+
+.check {
+  display: flex; align-items: center; gap: 8px; font-weight: 600;
+  input { accent-color: var(--accent); width: 16px; height: 16px; }
+}
+
+.form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+
+@media (max-width: 1000px) {
+  .layout--panel { grid-template-columns: minmax(0, 1fr); }
+  .panel { position: static; order: -1; }
+}
+
+@media (max-width: 640px) {
+  .product { grid-template-columns: 1fr auto; }
+  .switch { grid-column: 1; }
+  .row-actions { min-width: 0; }
+}

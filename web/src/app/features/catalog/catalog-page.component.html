@@ -1,0 +1,101 @@
+<header class="page-head">
+  <div>
+    <h1>Catalogue</h1>
+    <p class="muted">Les produits disponibles sont proposés aux clients sur WhatsApp.</p>
+  </div>
+  <button type="button" class="btn" (click)="openNew()">+ Nouveau produit</button>
+</header>
+
+@if (error(); as message) {
+  <p class="alert" role="alert">{{ message }}</p>
+}
+
+<div class="layout" [class.layout--panel]="editing() !== null">
+  <div class="groups">
+    @if (loading()) {
+      <p class="muted" aria-busy="true">Chargement…</p>
+    }
+    @for (group of groups(); track group.category) {
+      <section class="card group">
+        <h2>{{ group.category }} <span class="muted">({{ group.items.length }})</span></h2>
+        <ul>
+          @for (p of group.items; track p.id) {
+            <li class="product" [class.product--off]="!p.available">
+              <div class="info">
+                <strong>{{ p.name }}</strong>
+                @if (p.description) {
+                  <span class="muted desc">{{ p.description }}</span>
+                }
+              </div>
+              <span class="price">{{ p.price | fcfa }}</span>
+              <label class="switch" [title]="p.available ? 'Disponible' : 'Indisponible'">
+                <input type="checkbox" [checked]="p.available" (change)="toggleAvailable(p)" [attr.aria-label]="'Disponibilité de ' + p.name" />
+                <span>{{ p.available ? 'Disponible' : 'Épuisé' }}</span>
+              </label>
+              <div class="row-actions">
+                @if (confirmDelete() === p.id) {
+                  <span class="muted">Supprimer ?</span>
+                  <button type="button" class="btn btn--danger btn--sm" (click)="remove(p)">Oui</button>
+                  <button type="button" class="btn btn--ghost btn--sm" (click)="confirmDelete.set(null)">Non</button>
+                } @else {
+                  <button type="button" class="btn btn--ghost btn--sm" (click)="openEdit(p)">Modifier</button>
+                  <button type="button" class="btn btn--ghost btn--sm" (click)="confirmDelete.set(p.id)" [attr.aria-label]="'Supprimer ' + p.name">✕</button>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  </div>
+
+  @if (editing(); as target) {
+    <aside class="card panel" aria-label="Formulaire produit">
+      <h2>{{ target === 'new' ? 'Nouveau produit' : 'Modifier « ' + target.name + ' »' }}</h2>
+      <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <div class="field">
+          <label for="name">Nom</label>
+          <input id="name" class="input" formControlName="name" />
+          @if (form.controls.name.touched && form.controls.name.invalid) {
+            <span class="field-error">Entre 2 et 60 caractères.</span>
+          }
+        </div>
+
+        <div class="two">
+          <div class="field">
+            <label for="category">Catégorie</label>
+            <select id="category" class="input" formControlName="category">
+              @for (c of categories; track c) {
+                <option [value]="c">{{ c }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label for="price">Prix (FCFA)</label>
+            <input id="price" class="input" type="number" inputmode="numeric" min="50" step="50" formControlName="price" />
+            @if (form.controls.price.touched && form.controls.price.invalid) {
+              <span class="field-error">Nombre entier, 50 FCFA minimum.</span>
+            }
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="description">Description <span class="muted">(facultatif)</span></label>
+          <textarea id="description" class="input" rows="3" formControlName="description"></textarea>
+          @if (form.controls.description.invalid) {
+            <span class="field-error">160 caractères maximum.</span>
+          }
+        </div>
+
+        <label class="check">
+          <input type="checkbox" formControlName="available" /> Disponible à la commande
+        </label>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn--ghost" (click)="close()">Annuler</button>
+          <button type="submit" class="btn" [disabled]="saving()">{{ saving() ? 'Enregistrement…' : 'Enregistrer' }}</button>
+        </div>
+      </form>
+    </aside>
+  }
+</div>

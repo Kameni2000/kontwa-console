@@ -1,0 +1,27 @@
+# Requêtes d'exemple (VS Code « REST Client » ou Rider / Visual Studio)
+@base = http://localhost:5080/api
+
+### Connexion (compte démo)
+# @name login
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{ "email": "demo@kontwa.app", "password": "demo1234" }
+
+###
+@token = {{login.response.body.token}}
+
+### Commandes reçues
+GET {{base}}/orders?status=recue
+Authorization: Bearer {{token}}
+
+### Faire avancer une commande
+PATCH {{base}}/orders/o1053/status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "status": "preparation" }
+
+### Statistiques sur 7 jours
+GET {{base}}/stats?days=7
+Authorization: Bearer {{token}}

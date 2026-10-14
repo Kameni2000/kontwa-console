@@ -1,0 +1,40 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">K</span>
+      <div class="brand-text">
+        <strong>Kontwa Console</strong>
+        <span class="muted">{{ auth.user()?.shop }}</span>
+      </div>
+    </div>
+
+    <nav aria-label="Navigation principale">
+      @for (item of nav; track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active" class="nav-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="item.icon" /></svg>
+          <span>{{ item.label }}</span>
+          @if (item.path === '/commandes' && orders.counts().actives > 0) {
+            <span class="count" [attr.aria-label]="orders.counts().actives + ' commandes en cours'">{{ orders.counts().actives }}</span>
+          }
+        </a>
+      }
+    </nav>
+
+    <div class="user">
+      @if (demoMode) {
+        <span class="demo-pill">Démo</span>
+      }
+      <span class="muted user-name">{{ auth.user()?.name }}</span>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="auth.logout()">Se déconnecter</button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <span class="logo" aria-hidden="true">K</span>
+      <strong>{{ auth.user()?.shop }}</strong>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="auth.logout()">Déconnexion</button>
+    </header>
+    <router-outlet />
+  </main>
+</div>

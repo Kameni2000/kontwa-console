@@ -1,0 +1,62 @@
+<header class="page-head">
+  <div>
+    <h1>Statistiques</h1>
+    <p class="muted">Les commandes annulées ne sont pas comptées.</p>
+  </div>
+  <div class="segmented" role="group" aria-label="Période">
+    @for (p of periods; track p) {
+      <button type="button" [class.on]="days() === p" [attr.aria-pressed]="days() === p" (click)="days.set(p)">{{ p }} jours</button>
+    }
+  </div>
+</header>
+
+@if (error(); as message) {
+  <p class="alert" role="alert">{{ message }}</p>
+}
+
+@if (stats(); as s) {
+  <section class="kpis">
+    <div class="card kpi">
+      <span class="muted">Chiffre d'affaires du jour</span>
+      <strong>{{ s.revenueToday | fcfa }}</strong>
+    </div>
+    <div class="card kpi">
+      <span class="muted">Commandes du jour</span>
+      <strong>{{ s.ordersToday }}</strong>
+    </div>
+    <div class="card kpi">
+      <span class="muted">Panier moyen (jour)</span>
+      <strong>{{ s.averageBasket | fcfa }}</strong>
+    </div>
+    <div class="card kpi">
+      <span class="muted">Commandes en cours</span>
+      <strong>{{ s.pendingOrders }}</strong>
+    </div>
+  </section>
+
+  <div class="grid">
+    <section class="card block">
+      <div class="block-head">
+        <h2>Chiffre d'affaires par jour</h2>
+        <span class="muted">{{ periodRevenue() | fcfa }} · {{ periodOrders() }} commandes</span>
+      </div>
+      <kc-bar-chart [data]="revenueChart()" [format]="formatFcfa" [ariaLabel]="'Chiffre d\'affaires par jour sur ' + days() + ' jours'" />
+    </section>
+
+    <section class="card block">
+      <h2>Produits les plus vendus</h2>
+      <ol class="top">
+        @for (p of s.topProducts; track p.name) {
+          <li>
+            <div class="top-line"><span>{{ p.name }}</span><strong>{{ p.quantity }}</strong></div>
+            <div class="meter" aria-hidden="true"><span [style.width.%]="(p.quantity / topMax()) * 100"></span></div>
+          </li>
+        } @empty {
+          <li class="muted">Pas encore de ventes.</li>
+        }
+      </ol>
+    </section>
+  </div>
+} @else if (!error()) {
+  <p class="muted" aria-busy="true">Chargement…</p>
+}

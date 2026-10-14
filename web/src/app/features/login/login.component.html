@@ -1,0 +1,45 @@
+<main class="login">
+  <section class="panel card">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">K</span>
+      <div>
+        <h1>Kontwa Console</h1>
+        <p class="muted">Gérez les commandes WhatsApp de votre commerce.</p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field">
+        <label for="email">Courriel</label>
+        <input id="email" class="input" type="email" formControlName="email" autocomplete="username" />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <span class="field-error">Entrez une adresse courriel valide.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">Mot de passe</label>
+        <input id="password" class="input" type="password" formControlName="password" autocomplete="current-password" />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <span class="field-error">6 caractères minimum.</span>
+        }
+      </div>
+
+      @if (error(); as message) {
+        <p class="alert" role="alert">{{ message }}</p>
+      }
+
+      <button class="btn" type="submit" [disabled]="submitting()">
+        {{ submitting() ? 'Connexion…' : 'Se connecter' }}
+      </button>
+    </form>
+
+    @if (demoMode) {
+      <aside class="demo">
+        <p><strong>Version de démonstration</strong> — données fictives, rien n'est envoyé à un serveur.</p>
+        <p class="muted">{{ demo.email }} · {{ demo.password }}</p>
+        <button class="btn btn--ghost btn--sm" type="button" (click)="fillDemo()">Remplir avec le compte démo</button>
+      </aside>
+    }
+  </section>
+</main>
